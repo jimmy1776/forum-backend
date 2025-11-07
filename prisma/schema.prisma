@@ -38,7 +38,7 @@ model Post {
   likes     User[]   @relation("PostLikes")
 
   follows User[]  @relation("PostFollows")
-  reply   Reply[]
+  replies Reply[]
   author  User    @relation(fields: [userId], references: [id])
   tag     Tag[]
 }
