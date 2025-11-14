@@ -1,16 +1,19 @@
 import express from 'express';
 import * as postsController from '../controllers/posts.js';
+import * as validation from '../middleware/validation.js';
+
+
 const router = express.Router();
 
 router.get('/',postsController.getPosts);
-router.post('/',postsController.createPosts);
+router.post('/',validation.createPost,postsController.createPosts);
 
 
 router.get('/:id', postsController.getPost);
-router.patch('/:id',postsController.updatePost);
-router.delete('/:id',postsController.deletePost);
+router.patch('/:id',validation.updatePost,postsController.updatePost);
+router.delete('/',postsController.deletePost);
 
-router.post('/:postId/likes/:userId', postsController.createLike); 
+router.post('/:id/likes/', postsController.createLike); 
 router.delete('/:id/likes', postsController.deleteLike);
 
 router.post('/:id/follows', postsController.createFollow); 

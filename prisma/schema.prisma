@@ -13,12 +13,25 @@ model User {
   username             String                 @unique
   name                 String
   verified             Boolean                @default(true)
+  roles                Roles[]
   notificationSettings NotificationSettings[]
   posts                Post[]
   postsLiked           Post[]                 @relation("PostLikes")
   postsFollowed        Post[]                 @relation("PostFollows")
 
-  Reply Reply[]
+  replies  Reply[]
+  password Password?
+}
+
+model Password {
+  id     Int    @id @default(autoincrement())
+  userId Int    @unique
+  hash   String
+  user   User   @relation(fields: userId, references: id, onDelete: Cascade)
+}
+
+enum Roles {
+  ADMIN
 }
 
 enum NotificationSettings {
@@ -56,9 +69,7 @@ model Reply {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    Int
-  published Boolean  @default(false)
   postId    Int
-
-  author User @relation(fields: [userId], references: [id])
-  post   Post @relation(fields: [postId], references: [id])
+  author    User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
 }

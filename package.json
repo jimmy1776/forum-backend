@@ -23,8 +23,12 @@
   "dependencies": {
     "@apideck/better-ajv-errors": "^0.3.6",
     "@prisma/client": "^6.17.0",
+    "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.1",
     "xss": "^1.0.15",
     "zod": "^4.1.12"
