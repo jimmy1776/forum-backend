@@ -14,10 +14,10 @@ export const validateParamId: RequestHandler = (req,res,next)=>{
 };
 
 // higher order function -- returns a function
-export const validateBody = (schema: ZodType<any>): RequestHandler => 
+export const validateBody = (schema: ZodType<any> | (() => ZodType<any>)): RequestHandler => 
   (req,res,next) => {
-    const result = schema.safeParse(req.body);
-
+    const schemaObj: ZodType<any> = typeof schema === 'function' ? (schema as (() => ZodType<any>))() : schema;
+    const result = schemaObj.safeParse(req.body);
 
     if (!result.success) { 
       return next (new ValidationError(result.error.issues)); //error case 

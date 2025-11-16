@@ -1,31 +1,41 @@
-import { RequestHandler } from "express";
+// middleware/auth.ts
 import jwt from 'jsonwebtoken';
-import env from 'dotenv';
-env.config();
+import type { RequestHandler } from 'express';
 
-const auth: RequestHandler = (req,res,next) => {
-    try {
-    const JWT_SECRET = process.env.JWT_SECRET!;
-    const authHeader = req.headers.authorization!;
-    const token = authHeader.split(' ')[1]; 
-    
-    const decoded = jwt.verify(token, JWT_SECRET);
-    console.log(decoded);
-    req.user = decoded;
+const JWT_SECRET = process.env.JWT_SECRET!;
 
+interface JwtPayload {
+  id: number;
+  username: string;
+  roles: string[];
+}
+
+const authenticated: RequestHandler = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader?.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const token = authHeader.slice(7);
+
+  try {
+    const payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    (req as any).user = payload;   // 👈 this is what isAdmin will read
     next();
-    } catch (err){
-         res.sendStatus(401).json();
-    }
+  } catch {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
 };
 
-export const isAdmin: RequestHandler = (req,res,next) => { 
-    if(!req?.user?.roles?.includes('ADMIN')){
-        return res.status(403).json({error: 'You are not allowed to do this'})
-    }
-    next();
+export const isAdmin: RequestHandler = (req, res, next) => {
+  const user = (req as any).user as JwtPayload | undefined;
+
+  if (!user?.roles?.includes('ADMIN')) {
+    return res.status(403).json({ error: 'You are not allowed to do this' });
+  }
+
+  next();
 };
 
-
-
-export default auth;
+export default authenticated;
